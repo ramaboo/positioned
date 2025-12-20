@@ -8,8 +8,10 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "/Users/david/www/positioned/include",
                 "/Users/david/www/positioned/src",
+                "/Users/david/www/positioned/.pio/libdeps/esp32-s3-devkitc-1/FastAccelStepper/src",
+                "/Users/david/www/positioned/.pio/libdeps/esp32-s3-devkitc-1/Adafruit NeoPixel",
+                "/Users/david/www/positioned/src/drivers",
                 "/Users/david/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include",
                 "/Users/david/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include",
                 "/Users/david/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include/esp_additions/freertos",
@@ -241,8 +243,10 @@
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "/Users/david/www/positioned/include",
                     "/Users/david/www/positioned/src",
+                    "/Users/david/www/positioned/.pio/libdeps/esp32-s3-devkitc-1/FastAccelStepper/src",
+                    "/Users/david/www/positioned/.pio/libdeps/esp32-s3-devkitc-1/Adafruit NeoPixel",
+                    "/Users/david/www/positioned/src/drivers",
                     "/Users/david/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/newlib/platform_include",
                     "/Users/david/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include",
                     "/Users/david/.platformio/packages/framework-arduinoespressif32/tools/sdk/esp32s3/include/freertos/include/esp_additions/freertos",
