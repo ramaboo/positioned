@@ -4,90 +4,118 @@
 #include "StepperController.h"
 #include "EncoderController.h"
 #include "ButtonController.h"
+#include "Event.h"
 
-static App* s_app = nullptr;
+App::App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController)
+  : _ledController(ledController), _stepperController(stepperController), _encoderController(encoderController), _buttonController(buttonController) {}
 
-LedController* App::s_ledController = nullptr;
-StepperController* App::s_stepperController = nullptr;
-EncoderController* App::s_encoderController = nullptr;
-ButtonController* App::s_buttonController = nullptr;
+void App::begin() {
+  if (_ledController) _ledController->begin();
+  if (_stepperController) _stepperController->begin();
+  if (_encoderController) _encoderController->begin();
+  if (_buttonController) _buttonController->begin();
+}
 
-void App::init() {
-  if (s_app == nullptr) {
-    s_app = new App();
+void App::update() {
+  Event ev;
+  while (EventQueue::poll(ev)) {
+    switch (ev.type) {
+      case EventType::BackPressed:
+        handleBackPressed();
+        break;
+      case EventType::BackReleased:
+        handleBackReleased();
+        break;
+      case EventType::ForwardPressed:
+        handleForwardPressed();
+        break;
+      case EventType::ForwardReleased:
+        handleForwardReleased();
+        break;
+      case EventType::ControlPressed:
+        handleControlPressed();
+        break;
+      case EventType::ControlReleased:
+        handleControlReleased();
+        break;
+      case EventType::EncoderPressed:
+        handleEncoderPressed();
+        break;
+      case EventType::EncoderReleased:
+        handleEncoderReleased();
+        break;
+      case EventType::EncoderTurn:
+        handleEncoderTurn(ev.value);
+        break;
+      default:
+        break;
+    }
   }
 
-  s_ledController->begin();
-  s_stepperController->begin();
-  s_encoderController->begin();
-  s_buttonController->begin();
+  _buttonController->update();
 }
 
-void App::loop() {
-  s_buttonController->loop();
+void App::onBackPressed() { EventQueue::post(Event{EventType::BackPressed, 0}); }
+void App::onBackReleased() { EventQueue::post(Event{EventType::BackReleased, 0}); }
+void App::onControlPressed() { EventQueue::post(Event{EventType::ControlPressed, 0}); }
+void App::onControlReleased() { EventQueue::post(Event{EventType::ControlReleased, 0}); }
+void App::onForwardPressed() { EventQueue::post(Event{EventType::ForwardPressed, 0}); }
+void App::onForwardReleased() { EventQueue::post(Event{EventType::ForwardReleased, 0}); }
+void App::onEncoderPressed() { EventQueue::post(Event{EventType::EncoderPressed, 0}); }
+void App::onEncoderReleased() { EventQueue::post(Event{EventType::EncoderReleased, 0}); }
+void App::onEncoderTurn(uint32_t value) { EventQueue::post(Event{EventType::EncoderTurn, value}); }
+
+void App::handleBackPressed() {
+  Serial.println("EV: BackPressed");
+  if (StepperController::getStepper()) StepperController::getStepper()->runBackward();
+  if (_ledController) _ledController->setBlue();
+  _state = State::Running;
 }
 
-void App::setLedController(LedController* ledController) { s_ledController = ledController; }
-void App::setStepperController(StepperController* stepperController) { s_stepperController = stepperController; }
-void App::setEncoderController(EncoderController* encoderController) { s_encoderController = encoderController; }
-void App::setButtonController(ButtonController* buttonController) { s_buttonController = buttonController; }
-
-App& App::get() {
-  return *s_app;
+void App::handleBackReleased() {
+  Serial.println("EV: BackReleased");
+  if (StepperController::getStepper()) StepperController::getStepper()->stopMove();
+  if (_ledController) _ledController->setBlack();
+  _state = State::Idle;
 }
 
-void App::onBackPressed() {
-  Serial.println("App: Back Pressed");
-  auto st = StepperController::getStepper();
-  if (st) st->runBackward();
-  if (s_ledController) s_ledController->setBlue();
+void App::handleControlPressed() {
+  Serial.println("EV: ControlPressed");
+  if (StepperController::getStepper()) StepperController::getStepper()->stopMove();
+  _state = State::Idle;
 }
 
-void App::onBackReleased() {
-  Serial.println("App: Back Released");
-  auto st = StepperController::getStepper();
-  if (st) st->stopMove();
-  if (s_ledController) s_ledController->setBlack();
+void App::handleControlReleased() {
+  Serial.println("EV: ControlReleased");
 }
 
-void App::onControlPressed() {
-  Serial.println("App: Control Pressed");
-  auto st = StepperController::getStepper();
-  if (st) st->stopMove();
+void App::handleForwardPressed() {
+  Serial.println("EV: ForwardPressed");
+  if (StepperController::getStepper()) StepperController::getStepper()->runForward();
+  if (_ledController) _ledController->setGreen();
+  _state = State::Running;
 }
 
-void App::onControlReleased() {
-  Serial.println("App: Control Released");
+void App::handleForwardReleased() {
+  Serial.println("EV: ForwardReleased");
+  if (StepperController::getStepper()) StepperController::getStepper()->stopMove();
+  if (_ledController) _ledController->setBlack();
+  _state = State::Idle;
 }
 
-void App::onForwardPressed() {
-  Serial.println("App: Forward Pressed");
-  auto st = StepperController::getStepper();
-  if (st) st->runForward();
-  if (s_ledController) s_ledController->setGreen();
+void App::handleEncoderPressed() {
+  Serial.println("EV: EncoderPressed");
 }
 
-void App::onForwardReleased() {
-  Serial.println("App: Forward Released");
-  auto st = StepperController::getStepper();
-  if (st) st->stopMove();
-  if (s_ledController) s_ledController->setBlack();
+void App::handleEncoderReleased() {
+  Serial.println("EV: EncoderReleased");
 }
 
-void App::onEncoderPressed() {
-  Serial.println("App: Encoder Pressed");
-}
-
-void App::onEncoderReleased() {
-  Serial.println("App: Encoder Released");
-}
-
-void App::onEncoderTurn(uint32_t value) {
-  Serial.println("App: Encoder Turn " + String(value));
-  uint32_t speed = value * 4;
-  auto st = StepperController::getStepper();
-  if (st) {
-    st->setSpeedInHz(speed);
-    st->runBackward();
+void App::handleEncoderTurn(uint32_t value) {
+  Serial.println("EV: EncoderTurn " + String(value));
+  if (StepperController::getStepper()) {
+    StepperController::getStepper()->setSpeedInHz(value * 4);
+    StepperController::getStepper()->runBackward();
+    _state = State::Running;
   }
 }
