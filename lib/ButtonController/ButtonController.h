@@ -6,7 +6,7 @@ class ButtonController {
 public:
   ButtonController(uint8_t backPin, uint8_t controlPin, uint8_t forwardPin, uint8_t encoderPin);
   void begin();
-  void loop();
+  void update();
 
 private:
   ButtonConfig _backConfig;

@@ -1,7 +1,7 @@
 #include <Arduino.h>
 
 #include "EncoderController.h"
-#include "App.h"
+#include "Event.h"
 
 constexpr uint32_t MAX_SPEED = 1000;
 constexpr uint32_t MIN_SPEED = 0;
@@ -17,5 +17,5 @@ void EncoderController::begin() {
 }
 
 void EncoderController::knobCallback(uint32_t value) {
-  App::get().onEncoderTurn(value);
+  EventQueue::post(Event{EventType::EncoderTurn, value});
 }
