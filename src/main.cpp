@@ -1,9 +1,6 @@
 #include <Arduino.h>
-#include <FastAccelStepper.h>
-#include <ESP32RotaryEncoder.h>
-#include <AceButton.h>
-using namespace ace_button;
 
+#include "App.h"
 #include "LedController.h"
 #include "StepperController.h"
 #include "EncoderController.h"
@@ -31,25 +28,15 @@ ButtonController buttonController(BUTTON_BACK_PIN, BUTTON_CONTROL_PIN, BUTTON_FO
 void setup() {
   Serial.begin(115200);
 
-  ledController.begin();
-  ledController.setRed();
-
-  stepperController.begin();
-
-  encoderController.setStepper(stepperController.getStepper());
-  encoderController.begin();
-
-  buttonController.setStepper(stepperController.getStepper());
-  buttonController.begin();
-
-  ledController.setGreen();
+  App::setLedController(&ledController);
+  App::setStepperController(&stepperController);
+  App::setEncoderController(&encoderController);
+  App::setButtonController(&buttonController);
+  App::init();
 }
 
-
-
-
 void loop() {
-  buttonController.loop();
+  App::loop();
 }
 
 

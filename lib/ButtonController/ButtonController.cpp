@@ -1,8 +1,6 @@
 #include <Arduino.h>
-#include <FastAccelStepper.h>
 #include "ButtonController.h"
-
-FastAccelStepper* ButtonController::s_stepper = nullptr;
+#include "App.h"
 
 ButtonController::ButtonController(uint8_t backPin, uint8_t controlPin, uint8_t forwardPin, uint8_t encoderPin)
   : _backPin(backPin), _backButton(&_backConfig), _controlPin(controlPin), _controlButton(&_controlConfig), _forwardPin(forwardPin), _forwardButton(&_forwardConfig), _encoderPin(encoderPin), _encoderButton(&_encoderConfig) {}
@@ -33,48 +31,41 @@ void ButtonController::loop() {
   _encoderButton.check();
 }
 
-void ButtonController::setStepper(FastAccelStepper* stepper) { s_stepper = stepper; }
-
 void ButtonController::handleBackEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
-  if (s_stepper == nullptr) return;
   switch (eventType) {
     case AceButton::kEventPressed:
       Serial.println("Button Back: Pressed");
-      s_stepper->runBackward();
+      App::get().onBackPressed();
       break;
     case AceButton::kEventReleased:
       Serial.println("Button Back: Released");
-      s_stepper->stopMove();
+      App::get().onBackReleased();
       break;
   }
 }
 
 void ButtonController::handleControlEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
-  if (s_stepper == nullptr) return;
-
   switch (eventType) {
     case AceButton::kEventPressed:
       Serial.println("Button Control: Pressed");
-      s_stepper->stopMove();
+      App::get().onControlPressed();
       break;
     case AceButton::kEventReleased:
       Serial.println("Button Control: Released");
+      App::get().onControlReleased();
       break;
   }
 }
 
 void ButtonController::handleForwardEvent(AceButton* button, uint8_t eventType, uint8_t buttonState) {
-
-  if (s_stepper == nullptr) return;
-
   switch (eventType) {
     case AceButton::kEventPressed:
       Serial.println("Button Forward: Pressed");
-      s_stepper->runForward();
+      App::get().onForwardPressed();
       break;
     case AceButton::kEventReleased:
       Serial.println("Button Forward: Released");
-      s_stepper->stopMove();
+      App::get().onForwardReleased();
       break;
   }
 }
@@ -83,9 +74,11 @@ void ButtonController::handleEncoderEvent(AceButton* button, uint8_t eventType, 
   switch (eventType) {
     case AceButton::kEventPressed:
       Serial.println("Button Encoder: Pressed");
+      App::get().onEncoderPressed();
       break;
     case AceButton::kEventReleased:
       Serial.println("Button Encoder: Released");
+      App::get().onEncoderReleased();
       break;
   }
 }
