@@ -4,17 +4,16 @@
 #include <AceButton.h>
 using namespace ace_button;
 
-#include "Led.h"
-#include "ButtonController.h"
+#include "LedController.h"
+#include "StepperController.h"
 #include "EncoderController.h"
-
-
-
-#define dirPinStepper 4
-#define enablePinStepper 5
-#define stepPinStepper   6
+#include "ButtonController.h"
 
 constexpr uint8_t LED_PIN = 38;
+
+constexpr uint8_t STEPPER_DIR_PIN = 4;
+constexpr uint8_t STEPPER_ENABLE_PIN = 5;
+constexpr uint8_t STEPPER_STEP_PIN = 6;
 
 constexpr uint8_t ENCODER_CLK_PIN = 15;
 constexpr uint8_t ENCODER_DT_PIN = 16;
@@ -24,44 +23,26 @@ constexpr uint8_t BUTTON_CONTROL_PIN = 12;
 constexpr uint8_t BUTTON_FORWARD_PIN = 13;
 constexpr uint8_t BUTTON_ENCODER_PIN = 17;
 
-
-FastAccelStepperEngine engine = FastAccelStepperEngine();
-FastAccelStepper *stepper = nullptr;
-
-Led led(LED_PIN);
-ButtonController buttonController(BUTTON_BACK_PIN, BUTTON_CONTROL_PIN, BUTTON_FORWARD_PIN, BUTTON_ENCODER_PIN);
+LedController ledController(LED_PIN);
+StepperController stepperController(STEPPER_STEP_PIN, STEPPER_DIR_PIN, STEPPER_ENABLE_PIN);
 EncoderController encoderController(ENCODER_CLK_PIN, ENCODER_DT_PIN);
-
-
-
+ButtonController buttonController(BUTTON_BACK_PIN, BUTTON_CONTROL_PIN, BUTTON_FORWARD_PIN, BUTTON_ENCODER_PIN);
 
 void setup() {
   Serial.begin(115200);
 
-  led.begin();
-  led.setRed();
+  ledController.begin();
+  ledController.setRed();
 
-  engine.init();
-   stepper = engine.stepperConnectToPin(stepPinStepper);
-   if (stepper) {
-      stepper->setDirectionPin(dirPinStepper);
-      stepper->setEnablePin(enablePinStepper);
-      stepper->setAutoEnable(false);
-      stepper->enableOutputs();
-      stepper->setAcceleration(1000);
-   // run continuously until stopped
+  stepperController.begin();
 
-
-      led.setMagenta();
-   }
-
-  encoderController.setStepper(stepper);
+  encoderController.setStepper(stepperController.getStepper());
   encoderController.begin();
 
-  buttonController.setStepper(stepper);
+  buttonController.setStepper(stepperController.getStepper());
   buttonController.begin();
 
-  led.setGreen();
+  ledController.setGreen();
 }
 
 

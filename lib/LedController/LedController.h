@@ -2,9 +2,9 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 
-class Led {
+class LedController {
 public:
-  explicit Led(uint8_t pin);
+  explicit LedController(uint8_t pin);
 
   void begin();
 
