@@ -25,18 +25,15 @@ StepperController stepperController(STEPPER_STEP_PIN, STEPPER_DIR_PIN, STEPPER_E
 EncoderController encoderController(ENCODER_CLK_PIN, ENCODER_DT_PIN);
 ButtonController buttonController(BUTTON_BACK_PIN, BUTTON_CONTROL_PIN, BUTTON_FORWARD_PIN, BUTTON_ENCODER_PIN);
 
+static App app(&ledController, &stepperController, &encoderController, &buttonController);
+
 void setup() {
   Serial.begin(115200);
-
-  App::setLedController(&ledController);
-  App::setStepperController(&stepperController);
-  App::setEncoderController(&encoderController);
-  App::setButtonController(&buttonController);
-  App::init();
+  app.begin();
 }
 
 void loop() {
-  App::loop();
+  app.update();
 }
 
 

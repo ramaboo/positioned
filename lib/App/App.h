@@ -1,5 +1,5 @@
 #pragma once
-#include <Arduino.h>
+#include "Event.h"
 
 class LedController;
 class StepperController;
@@ -8,15 +8,10 @@ class ButtonController;
 
 class App {
 public:
-  static void setLedController(LedController* ledController);
-  static void setStepperController(StepperController* stepperController);
-  static void setEncoderController(EncoderController* encoderController);
-  static void setButtonController(ButtonController* buttonController);
+  App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController);
 
-  static void init();
-  static void loop();
-
-  static App& get();
+  void begin();
+  void update();
 
   void onBackPressed();
   void onBackReleased();
@@ -29,9 +24,20 @@ public:
   void onEncoderTurn(uint32_t value);
 
 private:
+  void handleBackPressed();
+  void handleBackReleased();
+  void handleControlPressed();
+  void handleControlReleased();
+  void handleForwardPressed();
+  void handleForwardReleased();
+  void handleEncoderPressed();
+  void handleEncoderReleased();
+  void handleEncoderTurn(uint32_t value);
 
-  static LedController* s_ledController;
-  static StepperController* s_stepperController;
-  static EncoderController* s_encoderController;
-  static ButtonController* s_buttonController;
+  LedController* _ledController;
+  StepperController* _stepperController;
+  EncoderController* _encoderController;
+  ButtonController* _buttonController;
+  enum class State { Idle, Running };
+  State _state = State::Idle;
 };
