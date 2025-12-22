@@ -1,17 +1,22 @@
 #pragma once
+#include <freertos/FreeRTOS.h>
+#include <freertos/queue.h>
 #include <stdint.h>
 
 enum class EventType : uint8_t {
   None = 0,
-  BackPressed,
-  BackReleased,
-  ControlPressed,
-  ControlReleased,
+  BackwardPressed,
+  BackwardReleased,
   ForwardPressed,
   ForwardReleased,
+  StartStopPressed,
+  StartStopReleased,
   EncoderPressed,
   EncoderReleased,
-  EncoderTurn
+  EncoderTurn,
+  SwitchBackward,
+  SwitchForward,
+  SwitchOff,
 };
 
 struct Event {
@@ -21,13 +26,13 @@ struct Event {
 };
 
 class EventQueue {
-public:
+ public:
   static bool post(const Event& e);
+  static bool postFromISR(const Event& e);
   static bool poll(Event& out);
+  static void init();
 
-private:
+ private:
   static const uint32_t SIZE = 16;
-  static Event _buffer[];
-  static volatile uint32_t _head;
-  static volatile uint32_t _tail;
+  static QueueHandle_t _queue;
 };

@@ -1,5 +1,5 @@
 #pragma once
-#include "Event.h"
+#include <stdint.h>
 
 class LedController;
 class StepperController;
@@ -7,32 +7,25 @@ class EncoderController;
 class ButtonController;
 
 class App {
-public:
+ public:
   App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController);
 
   void begin();
   void update();
 
-  void onBackPressed();
-  void onBackReleased();
-  void onControlPressed();
-  void onControlReleased();
-  void onForwardPressed();
-  void onForwardReleased();
-  void onEncoderPressed();
-  void onEncoderReleased();
-  void onEncoderTurn(uint32_t value);
-
-private:
-  void handleBackPressed();
-  void handleBackReleased();
-  void handleControlPressed();
-  void handleControlReleased();
+ private:
+  void handleBackwardPressed();
+  void handleBackwardReleased();
   void handleForwardPressed();
   void handleForwardReleased();
+  void handleStartStopPressed();
+  void handleStartStopReleased();
   void handleEncoderPressed();
   void handleEncoderReleased();
   void handleEncoderTurn(uint32_t value);
+  void handleSwitchBackward();
+  void handleSwitchForward();
+  void handleSwitchOff();
 
   LedController* _ledController;
   StepperController* _stepperController;
@@ -40,4 +33,9 @@ private:
   ButtonController* _buttonController;
   enum class State { Idle, Running };
   State _state = State::Idle;
+
+  enum class Direction { None, Forward, Backward };
+  Direction _direction = Direction::None;
+
+  uint32_t _currentSpeed = 0;
 };
