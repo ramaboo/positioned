@@ -10,10 +10,19 @@ class App {
  public:
   App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController);
 
+  enum class EncoderSpeed { Slow, Fast };
+  enum class Direction { Off, Forward, Backward };
+
   void begin();
   void update();
+  void validate();
 
  private:
+  static constexpr uint32_t MAX_USER_SPEED = 10000;
+  static constexpr uint32_t SLOW_SPEED_STEP = 4;
+  static constexpr uint32_t FAST_SPEED_STEP = 100;
+  static constexpr uint32_t INITIAL_USER_SPEED = 100;
+
   void handleBackwardPressed();
   void handleBackwardReleased();
   void handleForwardPressed();
@@ -22,20 +31,23 @@ class App {
   void handleStartStopReleased();
   void handleEncoderPressed();
   void handleEncoderReleased();
-  void handleEncoderTurn(uint32_t value);
+  void handleEncoderTurnRight(int32_t value);
+  void handleEncoderTurnLeft(int32_t value);
   void handleSwitchBackward();
   void handleSwitchForward();
   void handleSwitchOff();
+
+  void updateUserSpeed(int32_t value);
 
   LedController* _ledController;
   StepperController* _stepperController;
   EncoderController* _encoderController;
   ButtonController* _buttonController;
-  enum class State { Idle, Running };
-  State _state = State::Idle;
 
-  enum class Direction { None, Forward, Backward };
-  Direction _direction = Direction::None;
+  EncoderSpeed _userEncoderSpeed = EncoderSpeed::Slow;
 
-  uint32_t _currentSpeed = 0;
+  Direction _userDirection = Direction::Off;
+  Direction _currentDirection = Direction::Off;
+
+  int32_t _userSpeed = INITIAL_USER_SPEED;
 };

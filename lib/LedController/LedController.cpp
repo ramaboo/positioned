@@ -3,7 +3,7 @@
 LedController::LedController(uint8_t pin) : _pin(pin), _strip(1, _pin, NEO_GRB + NEO_KHZ800) {}
 
 void LedController::begin() {
-  _strip.setBrightness(127);
+  _strip.setBrightness(BRIGHTNESS);
   _strip.begin();
   _strip.show();
 }

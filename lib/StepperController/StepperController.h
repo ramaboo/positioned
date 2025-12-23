@@ -1,16 +1,23 @@
 #pragma once
 #include <FastAccelStepper.h>
 
+#include "App.h"
+
 class StepperController {
  public:
+  static constexpr uint32_t ACCELERATION = 1000;
+
   StepperController(uint8_t stepPin, uint8_t dirPin, uint8_t enablePin);
   void begin();
+  void validate();
 
-  void setSpeed(uint32_t speed);
+  void setSpeed(int32_t speed);
   void runForward();
   void runBackward();
   void stop();
   bool isRunning();
+
+  App::Direction getDirection();
 
  private:
   uint8_t _stepPin;

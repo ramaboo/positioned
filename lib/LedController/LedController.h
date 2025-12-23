@@ -5,6 +5,8 @@ class LedController {
  public:
   explicit LedController(uint8_t pin);
 
+  static constexpr uint8_t BRIGHTNESS = 127;
+
   void begin();
 
   void setColor(uint8_t red, uint8_t green, uint8_t blue);

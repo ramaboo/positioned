@@ -10,16 +10,23 @@ App::App(LedController* ledController, StepperController* stepperController, Enc
     : _ledController(ledController), _stepperController(stepperController), _encoderController(encoderController), _buttonController(buttonController) {}
 
 void App::begin() {
-  if (_ledController) _ledController->begin();
-  if (_stepperController) _stepperController->begin();
-  if (_encoderController) _encoderController->begin();
-  if (_buttonController) _buttonController->begin();
+  validate();
+
+  _ledController->begin();
+  _stepperController->begin();
+  _encoderController->begin();
+  _buttonController->begin();
+
+  _ledController->setWhite();
 }
 
 void App::update() {
   Event ev;
   while (EventQueue::poll(ev)) {
     switch (ev.type) {
+      case EventType::None:
+        Serial.println("EV: None");
+        break;
       case EventType::BackwardPressed:
         Serial.println("EV: Backward Pressed");
         handleBackwardPressed();
@@ -52,9 +59,13 @@ void App::update() {
         Serial.println("EV: Encoder Released");
         handleEncoderReleased();
         break;
-      case EventType::EncoderTurn:
-        Serial.println("EV: Encoder Turn " + String(ev.value));
-        handleEncoderTurn(ev.value);
+      case EventType::EncoderTurnRight:
+        Serial.println("EV: Encoder Turn Right");
+        handleEncoderTurnRight(ev.value);
+        break;
+      case EventType::EncoderTurnLeft:
+        Serial.println("EV: Encoder Turn Left");
+        handleEncoderTurnLeft(ev.value);
         break;
       case EventType::SwitchBackward:
         Serial.println("EV: Switch Backward");
@@ -76,74 +87,136 @@ void App::update() {
 
   _buttonController->update();
 }
+
 void App::handleBackwardPressed() {
-  if (_stepperController) {
-    _stepperController->setSpeed(_currentSpeed);
-    _stepperController->runBackward();
-  }
-  if (_ledController) _ledController->setBlue();
-  _state = State::Running;
+  _stepperController->setSpeed(_userSpeed);
+  _stepperController->runBackward();
+  _ledController->setMagenta();
+
+  _currentDirection = Direction::Backward;
 }
 
 void App::handleBackwardReleased() {
-  if (_stepperController) _stepperController->stop();
-  if (_ledController) _ledController->setBlack();
-  _state = State::Idle;
+  _stepperController->stop();
+  _ledController->setBlack();
+
+  _currentDirection = Direction::Off;
 }
 
 void App::handleForwardPressed() {
-  if (_stepperController) {
-    _stepperController->setSpeed(_currentSpeed);
-    _stepperController->runForward();
-  }
-  if (_ledController) _ledController->setGreen();
-  _state = State::Running;
+  _stepperController->setSpeed(_userSpeed);
+  _stepperController->runForward();
+  _ledController->setCyan();
+
+  _currentDirection = Direction::Forward;
 }
 
 void App::handleForwardReleased() {
-  if (_stepperController) _stepperController->stop();
-  if (_ledController) _ledController->setBlack();
-  _state = State::Idle;
+  _stepperController->stop();
+  _ledController->setBlack();
+
+  _currentDirection = Direction::Off;
 }
 
 void App::handleStartStopPressed() {
-  if (_stepperController) _stepperController->stop();
-  _state = State::Idle;
-}
-
-void App::handleStartStopReleased() {}
-
-void App::handleEncoderPressed() {}
-
-void App::handleEncoderReleased() {}
-
-void App::handleEncoderTurn(uint32_t value) {
-  _currentSpeed = value * 4;
-  if (_stepperController) {
-    _stepperController->setSpeed(_currentSpeed);
+  if (_currentDirection == Direction::Off) {
+    if (_userDirection == Direction::Forward) {
+      _stepperController->setSpeed(_userSpeed);
+      _stepperController->runForward();
+      _ledController->setCyan();
+      _currentDirection = Direction::Forward;
+    } else if (_userDirection == Direction::Backward) {
+      _stepperController->setSpeed(_userSpeed);
+      _stepperController->runBackward();
+      _ledController->setMagenta();
+      _currentDirection = Direction::Backward;
+    }
+  } else {
+    _stepperController->stop();
+    _ledController->setBlack();
+    _currentDirection = Direction::Off;
   }
 }
 
-void App::handleSwitchBackward() {
-  if (_stepperController) {
-    _stepperController->setSpeed(_currentSpeed);
-    _stepperController->runBackward();
+void App::handleStartStopReleased() { /* Do nothing. */ }
+
+void App::handleEncoderPressed() {
+  if (_userEncoderSpeed == EncoderSpeed::Slow) {
+    _userEncoderSpeed = EncoderSpeed::Fast;
+    _ledController->setBlue();
+  } else {
+    _userEncoderSpeed = EncoderSpeed::Slow;
+    _ledController->setYellow();
   }
-  if (_ledController) _ledController->setBlue();
-  _state = State::Running;
 }
 
-void App::handleSwitchForward() {
-  if (_stepperController) {
-    _stepperController->setSpeed(_currentSpeed);
-    _stepperController->runForward();
-  }
-  if (_ledController) _ledController->setGreen();
-  _state = State::Running;
+void App::handleEncoderReleased() { /* Do nothing. */ }
+
+void App::handleEncoderTurnRight(int32_t value) {
+  updateUserSpeed(value);
+  _ledController->setGreen();
 }
+
+void App::handleEncoderTurnLeft(int32_t value) {
+  updateUserSpeed(value);
+  _ledController->setRed();
+}
+
+void App::handleSwitchBackward() { _userDirection = Direction::Backward; }
+
+void App::handleSwitchForward() { _userDirection = Direction::Forward; }
 
 void App::handleSwitchOff() {
-  if (_stepperController) _stepperController->stop();
-  if (_ledController) _ledController->setBlack();
-  _state = State::Idle;
+  _userDirection = Direction::Off;
+  _stepperController->stop();
+  _ledController->setBlack();
+
+  _userDirection = Direction::Off;
+  _currentDirection = Direction::Off;
+}
+
+void App::validate() {
+  if (!_ledController || !_stepperController || !_encoderController || !_buttonController) {
+    if (!_ledController) {
+      Serial.println("App: LED Failed");
+    }
+
+    if (!_stepperController) {
+      Serial.println("App: Stepper Failed");
+    }
+
+    if (!_encoderController) {
+      Serial.println("App: Encoder Failed");
+    }
+
+    if (!_buttonController) {
+      Serial.println("App: Button Failed");
+    }
+
+    Serial.println("App: Restarting");
+
+    delay(5000);
+    ESP.restart();
+  }
+}
+
+void App::updateUserSpeed(int32_t value) {
+  int32_t step = 0;
+
+  if (_userEncoderSpeed == EncoderSpeed::Slow) {
+    step = SLOW_SPEED_STEP * value;
+  } else if (_userEncoderSpeed == EncoderSpeed::Fast) {
+    step = FAST_SPEED_STEP * value;
+  }
+
+  _userSpeed += step;
+
+  if (_userSpeed < 0) {
+    _userSpeed = 0;
+  } else if (_userSpeed > MAX_USER_SPEED) {
+    _userSpeed = MAX_USER_SPEED;
+  }
+
+  Serial.println("User Speed: " + String(_userSpeed));
+  _stepperController->setSpeed(_userSpeed);
 }

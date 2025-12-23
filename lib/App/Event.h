@@ -13,7 +13,8 @@ enum class EventType : uint8_t {
   StartStopReleased,
   EncoderPressed,
   EncoderReleased,
-  EncoderTurn,
+  EncoderTurnRight,
+  EncoderTurnLeft,
   SwitchBackward,
   SwitchForward,
   SwitchOff,
@@ -21,8 +22,8 @@ enum class EventType : uint8_t {
 
 struct Event {
   EventType type = EventType::None;
-  uint32_t value = 0;
-  constexpr Event(EventType t = EventType::None, uint32_t v = 0) : type(t), value(v) {}
+  int32_t value = 0;
+  constexpr Event(EventType t = EventType::None, int32_t v = 0) : type(t), value(v) {}
 };
 
 class EventQueue {

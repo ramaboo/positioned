@@ -10,38 +10,54 @@ void StepperController::begin() {
   engine.init();
   s_stepper = engine.stepperConnectToPin(_stepPin);
 
-  if (s_stepper) {
-    s_stepper->setDirectionPin(_dirPin);
-    s_stepper->setEnablePin(_enablePin);
-    s_stepper->setAutoEnable(false);
-    s_stepper->enableOutputs();
-    s_stepper->setAcceleration(1000);
+  validate();
 
-    Serial.println("Stepper: Initialized");
-  } else {
-    Serial.println("Stepper: Initialization Failed");
+  s_stepper->setDirectionPin(_dirPin);
+  s_stepper->setEnablePin(_enablePin);
+  s_stepper->setAutoEnable(false);
+  s_stepper->enableOutputs();
+  s_stepper->setAcceleration(ACCELERATION);
+
+  stop();
+}
+
+void StepperController::setSpeed(int32_t speed) {
+  if (speed <= 0) {
+    speed = 1;
+  }
+
+  s_stepper->setSpeedInHz(speed);
+
+  if (s_stepper->isRunning()) {
+    s_stepper->applySpeedAcceleration();
   }
 }
 
-void StepperController::setSpeed(uint32_t speed) {
-  if (s_stepper) {
-    s_stepper->setSpeedInHz(speed);
-    if (s_stepper->isRunning()) {
-      s_stepper->applySpeedAcceleration();
-    }
+void StepperController::runForward() { s_stepper->runForward(); }
+
+void StepperController::runBackward() { s_stepper->runBackward(); }
+
+void StepperController::stop() { s_stepper->stopMove(); }
+
+bool StepperController::isRunning() { return s_stepper->isRunning(); }
+
+App::Direction StepperController::getDirection() {
+  uint8_t state = s_stepper->rampState();
+
+  if (state & RAMP_DIRECTION_COUNT_UP) {
+    return App::Direction::Forward;
+  } else if (state & RAMP_DIRECTION_COUNT_DOWN) {
+    return App::Direction::Backward;
+  }
+
+  return App::Direction::Off;
+}
+
+void StepperController::validate() {
+  if (!s_stepper) {
+    Serial.println("Stepper: Initalization Failed");
+
+    delay(5000);
+    ESP.restart();
   }
 }
-
-void StepperController::runForward() {
-  if (s_stepper) s_stepper->runForward();
-}
-
-void StepperController::runBackward() {
-  if (s_stepper) s_stepper->runBackward();
-}
-
-void StepperController::stop() {
-  if (s_stepper) s_stepper->stopMove();
-}
-
-bool StepperController::isRunning() { return s_stepper && s_stepper->isRunning(); }
