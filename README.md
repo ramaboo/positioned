@@ -7,4 +7,5 @@ A stepper motor controller designed for welding applications.
 ### Prerequisites
 
 [PlatformIO](https://platformio.org/)
-ESP32-S3 DevKitC-1 board
+
+[ESP32-S3](../..//wiki/ESP32)
