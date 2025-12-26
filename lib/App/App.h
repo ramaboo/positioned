@@ -1,27 +1,31 @@
 #pragma once
 #include <stdint.h>
 
-class LedController;
-class StepperController;
-class EncoderController;
-class ButtonController;
+#include "ButtonController.h"
+#include "EncoderController.h"
+#include "LedController.h"
+#include "StepperController.h"
+#include "SwitchController.h"
+#include "Types.h"
 
 class App {
  public:
-  App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController);
+  App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController,
+      SwitchController* switchController);
 
   enum class EncoderSpeed { Slow, Fast };
-  enum class Direction { Off, Forward, Backward };
 
   void begin();
   void update();
   void validate();
 
  private:
-  static constexpr uint32_t MAX_USER_SPEED = 10000;
-  static constexpr uint32_t SLOW_SPEED_STEP = 4;
-  static constexpr uint32_t FAST_SPEED_STEP = 100;
-  static constexpr uint32_t INITIAL_USER_SPEED = 100;
+  static constexpr int32_t MAX_USER_SPEED = 10000;
+  static constexpr int32_t MIN_USER_SPEED = 1;
+  static constexpr int32_t INITIAL_USER_SPEED = 100;
+
+  static constexpr int32_t SLOW_SPEED_STEP = 4;
+  static constexpr int32_t FAST_SPEED_STEP = 100;
 
   void handleBackwardPressed();
   void handleBackwardReleased();
@@ -33,16 +37,18 @@ class App {
   void handleEncoderReleased();
   void handleEncoderTurnRight(int32_t value);
   void handleEncoderTurnLeft(int32_t value);
-  void handleSwitchBackward();
-  void handleSwitchForward();
   void handleSwitchOff();
+  void handleSwitchForward();
+  void handleSwitchBackward();
 
   void updateUserSpeed(int32_t value);
+  void processEvents();
 
   LedController* _ledController;
   StepperController* _stepperController;
   EncoderController* _encoderController;
   ButtonController* _buttonController;
+  SwitchController* _switchController;
 
   EncoderSpeed _userEncoderSpeed = EncoderSpeed::Slow;
 

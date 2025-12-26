@@ -22,10 +22,6 @@ void StepperController::begin() {
 }
 
 void StepperController::setSpeed(int32_t speed) {
-  if (speed <= 0) {
-    speed = 1;
-  }
-
   s_stepper->setSpeedInHz(speed);
 
   if (s_stepper->isRunning()) {
@@ -41,16 +37,16 @@ void StepperController::stop() { s_stepper->stopMove(); }
 
 bool StepperController::isRunning() { return s_stepper->isRunning(); }
 
-App::Direction StepperController::getDirection() {
+Direction StepperController::getDirection() {
   uint8_t state = s_stepper->rampState();
 
   if (state & RAMP_DIRECTION_COUNT_UP) {
-    return App::Direction::Forward;
+    return Direction::Forward;
   } else if (state & RAMP_DIRECTION_COUNT_DOWN) {
-    return App::Direction::Backward;
+    return Direction::Backward;
   }
 
-  return App::Direction::Off;
+  return Direction::Off;
 }
 
 void StepperController::validate() {

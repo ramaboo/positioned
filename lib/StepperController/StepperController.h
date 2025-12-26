@@ -1,11 +1,11 @@
 #pragma once
 #include <FastAccelStepper.h>
 
-#include "App.h"
+#include "Types.h"
 
 class StepperController {
  public:
-  static constexpr uint32_t ACCELERATION = 1000;
+  static constexpr int32_t ACCELERATION = 1000;
 
   StepperController(uint8_t stepPin, uint8_t dirPin, uint8_t enablePin);
   void begin();
@@ -17,7 +17,7 @@ class StepperController {
   void stop();
   bool isRunning();
 
-  App::Direction getDirection();
+  Direction getDirection();
 
  private:
   uint8_t _stepPin;

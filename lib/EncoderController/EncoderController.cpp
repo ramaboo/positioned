@@ -15,9 +15,9 @@ void EncoderController::begin() {
 
 void EncoderController::knobCallback(int32_t value) {
   if (value == 1) {
-    EventQueue::post(Event{EventType::EncoderTurnRight, value});
+    EventQueue::post(Event{EventType::EncoderTurnLeft, -1});
   } else if (value == -1) {
-    EventQueue::post(Event{EventType::EncoderTurnLeft, value});
+    EventQueue::post(Event{EventType::EncoderTurnRight, 1});
   }
 
   if (instance) {
