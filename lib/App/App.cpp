@@ -53,8 +53,6 @@ void App::handleBackwardReleased() {
 }
 
 void App::handleForwardPressed() {
-  _switchController->getDirection();
-
   _stepperController->setSpeed(_userSpeed);
   _stepperController->runForward();
   _currentDirection = Direction::Forward;
