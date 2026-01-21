@@ -42,10 +42,10 @@ class App {
   void updateUserSpeed(int32_t value);
   void processEvents();
 
+  ButtonController* _buttonController;
+  EncoderController* _encoderController;
   LedController* _ledController;
   StepperController* _stepperController;
-  EncoderController* _encoderController;
-  ButtonController* _buttonController;
   SwitchController* _switchController;
 
   EncoderSpeed _userEncoderSpeed = EncoderSpeed::Slow;
