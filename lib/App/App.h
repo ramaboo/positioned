@@ -10,10 +10,8 @@
 
 class App {
  public:
-  App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController,
+  App(ButtonController* buttonController, EncoderController* encoderController, LedController* ledController, StepperController* stepperController,
       SwitchController* switchController);
-
-  enum class EncoderSpeed { Slow, Fast };
 
   void begin();
   void update();

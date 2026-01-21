@@ -6,12 +6,12 @@
 #include "LedController.h"
 #include "StepperController.h"
 
-App::App(LedController* ledController, StepperController* stepperController, EncoderController* encoderController, ButtonController* buttonController,
+App::App(ButtonController* buttonController, EncoderController* encoderController, LedController* ledController, StepperController* stepperController,
          SwitchController* switchController)
-    : _ledController(ledController),
-      _stepperController(stepperController),
+    : _buttonController(buttonController),
       _encoderController(encoderController),
-      _buttonController(buttonController),
+      _ledController(ledController),
+      _stepperController(stepperController),
       _switchController(switchController) {}
 
 void App::begin() {
@@ -19,10 +19,10 @@ void App::begin() {
 
   validate();
 
+  _buttonController->begin();
+  _encoderController->begin();
   _ledController->begin();
   _stepperController->begin();
-  _encoderController->begin();
-  _buttonController->begin();
   _switchController->begin();
 
   Serial.println("App: Started");
