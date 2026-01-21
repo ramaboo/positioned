@@ -8,10 +8,10 @@
 #include "StepperController.h"
 #include "SwitchController.h"
 
+ButtonController buttonController(BUTTON_BACKWARD_PIN, BUTTON_FORWARD_PIN, BUTTON_START_STOP_PIN, BUTTON_ENCODER_PIN);
+EncoderController encoderController(ENCODER_CLK_PIN, ENCODER_DT_PIN);
 LedController ledController(LED_PIN);
 StepperController stepperController(STEPPER_STEP_PIN, STEPPER_DIR_PIN, STEPPER_ENABLE_PIN);
-EncoderController encoderController(ENCODER_CLK_PIN, ENCODER_DT_PIN);
-ButtonController buttonController(BUTTON_BACKWARD_PIN, BUTTON_FORWARD_PIN, BUTTON_START_STOP_PIN, BUTTON_ENCODER_PIN);
 SwitchController switchController(SWITCH_BACKWARD_PIN, SWITCH_FORWARD_PIN);
 
 static App app(&buttonController, &encoderController, &ledController, &stepperController, &switchController);
